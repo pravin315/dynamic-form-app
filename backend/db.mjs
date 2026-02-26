@@ -1,15 +1,16 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import mysql from "mysql2/promise";
+import pkg from "pg";
+const { Pool } = pkg;
 
-const connection = await mysql.createConnection({
-  uri: process.env.MYSQL_URL,
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false,
   },
 });
 
-console.log("Database Connected ✅");
+console.log("PostgreSQL Connected ✅");
 
-export default connection;
+export default pool;

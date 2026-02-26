@@ -1,47 +1,43 @@
-import db from "../../db.mjs";
-import { v4 as uuidv4 } from "uuid";
+import pool from "../../db.mjs";
 
-/* ================= CREATE FORM ================= */
-
+// CREATE FORM
 export const createForm = async (req, res) => {
-  const { title, fields } = req.body;
+  try {
+    const { title } = req.body;
 
-  const formId = uuidv4();
+    const result = await pool.query(
+      "INSERT INTO forms(title) VALUES($1) RETURNING *",
+      [title]
+    );
 
-  await db.execute(
-    "INSERT INTO forms (id,title,fields) VALUES (?,?,?)",
-    [formId, title, JSON.stringify(fields)]
-  );
-
-  res.json({
-    link: `http://localhost:5173/form/${formId}`,
-    formId,
-  });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error creating form");
+  }
 };
 
-/* ================= GET FORM ================= */
-
+// GET FORM
 export const getForm = async (req, res) => {
   const { formId } = req.params;
 
-  const [rows] = await db.execute(
-    "SELECT * FROM forms WHERE id=?",
+  const result = await pool.query(
+    "SELECT * FROM forms WHERE id=$1",
     [formId]
   );
 
-  res.json(rows[0]);
+  res.json(result.rows[0]);
 };
 
-/* ================= SUBMIT RESPONSE ================= */
-
+// SUBMIT RESPONSE
 export const submitResponse = async (req, res) => {
   const { formId } = req.params;
-  const answers = req.body;
+  const { response } = req.body;
 
-  await db.execute(
-    "INSERT INTO responses (form_id,answers) VALUES (?,?)",
-    [formId, JSON.stringify(answers)]
+  await pool.query(
+    "INSERT INTO responses(form_id, response) VALUES($1,$2)",
+    [formId, response]
   );
 
-  res.json({ message: "Saved ✅" });
+  res.json({ message: "Submitted ✅" });
 };
