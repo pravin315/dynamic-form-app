@@ -33,8 +33,9 @@ function DynamicForm() {
         }
       );
 
-      // ⚠️ change this after frontend deploy
-      const generatedLink = `http://localhost:5173/form/${res.data.formId}`;
+      // ✅ AUTO DOMAIN (LOCAL + VERCEL)
+      const generatedLink =
+        `${window.location.origin}/form/${res.data.formId}`;
 
       setShareLink(generatedLink);
     } catch (err) {
@@ -85,7 +86,7 @@ function DynamicForm() {
         <div style={{ marginTop: 20 }}>
           <h4>Share this link:</h4>
 
-          <a href={shareLink} target="_blank">
+          <a href={shareLink} target="_blank" rel="noreferrer">
             {shareLink}
           </a>
         </div>
