@@ -6,11 +6,9 @@ const { Pool } = pkg;
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
+  ssl: { rejectUnauthorized: false },
 });
 
-console.log("PostgreSQL Connected ✅");
+console.log("DB Connected ✅");
 
 export default pool;
