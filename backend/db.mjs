@@ -1,11 +1,14 @@
 import dotenv from "dotenv";
-dotenv.config();   // ⭐ ADD THIS LINE
+dotenv.config();
 
 import mysql from "mysql2/promise";
 
-const connection = await mysql.createConnection(
-  process.env.MYSQL_URL
-);
+const connection = await mysql.createConnection({
+  uri: process.env.MYSQL_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
 
 console.log("Database Connected ✅");
 
