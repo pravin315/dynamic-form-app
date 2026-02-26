@@ -11,8 +11,11 @@ function FormPage() {
   /* LOAD FORM */
   useEffect(() => {
     axios
-      .get(`http:// https://dynamic-form-y9r4.onrender.com/form/${formId}`)
-      .then((res) => setForm(res.data));
+      .get(
+        `https://dynamic-form-y9r4.onrender.com/form/${formId}`
+      )
+      .then((res) => setForm(res.data))
+      .catch((err) => console.error(err));
   }, [formId]);
 
   /* INPUT CHANGE */
@@ -28,7 +31,7 @@ function FormPage() {
     e.preventDefault();
 
     await axios.post(
-      `http://localhost:8050/submit/${formId}`,
+      `https://dynamic-form-y9r4.onrender.com/submit/${formId}`,
       answers
     );
 
@@ -37,7 +40,7 @@ function FormPage() {
 
   if (!form) return <h3>Loading...</h3>;
 
-  /* FIX JSON ERROR */
+  /* HANDLE JSON */
   const fields =
     typeof form.fields === "string"
       ? JSON.parse(form.fields)
