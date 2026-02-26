@@ -2,49 +2,57 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
+const API = "https://dynamic-form-app-1.onrender.com";
+
 function FormPage() {
   const { formId } = useParams();
 
   const [form, setForm] = useState(null);
   const [answers, setAnswers] = useState({});
 
-  /* LOAD FORM */
+  /* ---------- LOAD FORM ---------- */
   useEffect(() => {
     axios
-      .get(
-        `https://dynamic-form-app-1.onrender.com/form/${formId}`
-      )
+      .get(`${API}/form/${formId}`)
       .then((res) => setForm(res.data))
-      .catch((err) => console.error(err));
+      .catch(console.error);
   }, [formId]);
 
-  /* INPUT CHANGE */
+  /* ---------- INPUT CHANGE ---------- */
   const handleChange = (e, label) => {
-    setAnswers({
-      ...answers,
+    setAnswers((prev) => ({
+      ...prev,
       [label]: e.target.value,
-    });
+    }));
   };
 
-  /* SUBMIT RESPONSE */
+  /* ---------- SUBMIT ---------- */
   const submitForm = async (e) => {
     e.preventDefault();
 
-    await axios.post(
-      `https://dynamic-form-app-1.onrender.com/submit/${formId}`,
-      answers
-    );
+    try {
+      await axios.post(`${API}/submit/${formId}`, answers);
 
-    alert("Response Submitted ✅");
+      alert("Response Submitted ✅");
+      setAnswers({});
+    } catch (err) {
+      console.error(err);
+      alert("Submit failed ❌");
+    }
   };
 
   if (!form) return <h3>Loading...</h3>;
 
-  /* HANDLE JSON */
-  const fields =
-    typeof form.fields === "string"
-      ? JSON.parse(form.fields)
-      : form.fields;
+  /* ---------- SAFE JSON ---------- */
+  let fields = [];
+  try {
+    fields =
+      typeof form.fields === "string"
+        ? JSON.parse(form.fields)
+        : form.fields;
+  } catch {
+    fields = [];
+  }
 
   return (
     <div style={{ padding: 20 }}>
@@ -52,12 +60,13 @@ function FormPage() {
 
       <form onSubmit={submitForm}>
         {fields.map((field) => (
-          <div key={field.id}>
+          <div key={field.id} style={{ marginBottom: 10 }}>
             <label>{field.label}</label>
 
             <input
-              type={field.type}
+              type={field.type || "text"}
               required
+              value={answers[field.label] || ""}
               onChange={(e) =>
                 handleChange(e, field.label)
               }
@@ -72,4 +81,3 @@ function FormPage() {
 }
 
 export default FormPage;
-
