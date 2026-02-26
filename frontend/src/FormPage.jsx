@@ -12,7 +12,7 @@ function FormPage() {
   useEffect(() => {
     axios
       .get(
-        `https://dynamic-form-y9r4.onrender.com/form/${formId}`
+        `https://dynamic-form-app-1.onrender.com/form/${formId}`
       )
       .then((res) => setForm(res.data))
       .catch((err) => console.error(err));
@@ -31,7 +31,7 @@ function FormPage() {
     e.preventDefault();
 
     await axios.post(
-      `https://dynamic-form-y9r4.onrender.com/submit/${formId}`,
+      `https://dynamic-form-app-1.onrender.com/submit/${formId}`,
       answers
     );
 

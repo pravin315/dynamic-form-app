@@ -26,7 +26,7 @@ function DynamicForm() {
   const createLink = async () => {
     try {
       const res = await axios.post(
-        "https://dynamic-form-y9r4.onrender.com/create-form",
+        "https://dynamic-form-app-1.onrender.com/create-form",
         {
           title: "My Dynamic Form",
           fields,
