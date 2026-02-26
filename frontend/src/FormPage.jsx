@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-
+import "./FormPage.css";
 const API = "https://dynamic-form-app-1.onrender.com";
 
 function FormPage() {
@@ -55,12 +55,13 @@ function FormPage() {
   }
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>{form.title}</h2>
+  <div className="form-wrapper">
+    <div className="form-box">
+      <h2 className="form-title">{form.title}</h2>
 
       <form onSubmit={submitForm}>
         {fields.map((field) => (
-          <div key={field.id} style={{ marginBottom: 10 }}>
+          <div key={field.id} className="form-field">
             <label>{field.label}</label>
 
             <input
@@ -74,10 +75,13 @@ function FormPage() {
           </div>
         ))}
 
-        <button type="submit">Submit</button>
+        <button type="submit" className="submit-btn">
+          Submit
+        </button>
       </form>
     </div>
-  );
+  </div>
+);
 }
 
 export default FormPage;
