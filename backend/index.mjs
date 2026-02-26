@@ -19,9 +19,7 @@ app.use(cors({
 
 app.use(express.json());
 
-app.get("/", (req, res) => {
-  res.send("Dynamic Form API Running ✅");
-});
+
 
 app.post("/create-form", createForm);
 app.get("/form/:formId", getForm);
