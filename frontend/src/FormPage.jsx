@@ -11,7 +11,7 @@ function FormPage() {
   /* LOAD FORM */
   useEffect(() => {
     axios
-      .get(`http://localhost:8050/form/${formId}`)
+      .get(`http:// https://dynamic-form-y9r4.onrender.com/form/${formId}`)
       .then((res) => setForm(res.data));
   }, [formId]);
 

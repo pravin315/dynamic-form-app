@@ -3,7 +3,7 @@ import axios from "axios";
 
 function DynamicForm() {
   const [fields, setFields] = useState([]);
-  const [formId, setFormId] = useState(null);
+  const [shareLink, setShareLink] = useState("");
 
   /* ADD FIELD */
   const addField = () => {
@@ -22,31 +22,25 @@ function DynamicForm() {
     );
   };
 
-  /* CREATE LINK */
+  /* CREATE SHAREABLE LINK */
   const createLink = async () => {
-    const res = await axios.post(
-      "http://localhost:8050/create-form",
-      {
-        title: "My Dynamic Form",
-        fields,
-      }
-    );
+    try {
+      const res = await axios.post(
+        "https://dynamic-form-y9r4.onrender.com/create-form",
+        {
+          title: "My Dynamic Form",
+          fields,
+        }
+      );
 
-    setFormId(res.data.formId);
+      // ⚠️ change this after frontend deploy
+      const generatedLink = `http://localhost:5173/form/${res.data.formId}`;
 
-    alert("Form Created ✅");
-  };
-
-  /* WHATSAPP SHARE */
-  const shareWhatsApp = () => {
-    const link = `http://192.168.1.5:5173/form/${formId}`;
-
-    const text = `Please fill this form:\n${link}`;
-
-    window.open(
-      `https://wa.me/?text=${encodeURIComponent(text)}`,
-      "_blank"
-    );
+      setShareLink(generatedLink);
+    } catch (err) {
+      console.error(err);
+      alert("Error creating form");
+    }
   };
 
   return (
@@ -84,23 +78,20 @@ function DynamicForm() {
       <hr />
 
       <button onClick={createLink}>
-        Create Shareable Link
+        Generate Link
       </button>
 
-      {formId && (
-        <>
-          <p>
-            Link:
-            http://localhost:5173/form/{formId}
-          </p>
+      {shareLink && (
+        <div style={{ marginTop: 20 }}>
+          <h4>Share this link:</h4>
 
-          <button onClick={shareWhatsApp}>
-            Share on WhatsApp 📱
-          </button>
-        </>
+          <a href={shareLink} target="_blank">
+            {shareLink}
+          </a>
+        </div>
       )}
     </div>
   );
 }
 
-export default DynamicForm; 
+export default DynamicForm;
