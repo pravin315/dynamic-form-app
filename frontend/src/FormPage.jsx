@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import "./FormPage.css";
+
 const API = "https://dynamic-form-app-1.onrender.com";
 
 function FormPage() {
@@ -19,11 +20,30 @@ function FormPage() {
   }, [formId]);
 
   /* ---------- INPUT CHANGE ---------- */
-  const handleChange = (e, label) => {
+  const handleChange = (value, label) => {
     setAnswers((prev) => ({
       ...prev,
-      [label]: e.target.value,
+      [label]: value,
     }));
+  };
+
+  /* ---------- CHECKBOX CHANGE ---------- */
+  const handleCheckbox = (label, option) => {
+    setAnswers((prev) => {
+      const current = prev[label] || [];
+
+      if (current.includes(option)) {
+        return {
+          ...prev,
+          [label]: current.filter((o) => o !== option),
+        };
+      } else {
+        return {
+          ...prev,
+          [label]: [...current, option],
+        };
+      }
+    });
   };
 
   /* ---------- SUBMIT ---------- */
@@ -32,7 +52,6 @@ function FormPage() {
 
     try {
       await axios.post(`${API}/submit/${formId}`, answers);
-
       alert("Response Submitted ✅");
       setAnswers({});
     } catch (err) {
@@ -54,34 +73,126 @@ function FormPage() {
     fields = [];
   }
 
-  return (
-  <div className="form-wrapper">
-    <div className="form-box">
-      <h2 className="form-title">{form.title}</h2>
+  /* ---------- FIELD RENDERER ---------- */
+  const renderField = (field) => {
+    const value = answers[field.label] || "";
 
-      <form onSubmit={submitForm}>
-        {fields.map((field) => (
-          <div key={field.id} className="form-field">
-            <label>{field.label}</label>
+    switch (field.type) {
+      /* TEXT TYPES */
+      case "text":
+      case "number":
+      case "email":
+      case "date":
+        return (
+          <input
+            type={field.type}
+            required
+            value={value}
+            onChange={(e) =>
+              handleChange(e.target.value, field.label)
+            }
+          />
+        );
 
+      /* TEXTAREA */
+      case "textarea":
+        return (
+          <textarea
+            required
+            value={value}
+            onChange={(e) =>
+              handleChange(e.target.value, field.label)
+            }
+          />
+        );
+
+      /* DROPDOWN */
+      case "dropdown":
+        return (
+          <select
+            required
+            value={value}
+            onChange={(e) =>
+              handleChange(e.target.value, field.label)
+            }
+          >
+            <option value="">Select</option>
+            {field.options?.map((opt, i) => (
+              <option key={i} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        );
+
+      /* RADIO */
+      case "radio":
+        return field.options?.map((opt, i) => (
+          <label key={i} style={{ marginRight: 10 }}>
             <input
-              type={field.type || "text"}
-              required
-              value={answers[field.label] || ""}
+              type="radio"
+              name={field.label}
+              value={opt}
+              checked={value === opt}
               onChange={(e) =>
-                handleChange(e, field.label)
+                handleChange(e.target.value, field.label)
               }
             />
-          </div>
-        ))}
+            {opt}
+          </label>
+        ));
 
-        <button type="submit" className="submit-btn">
-          Submit
-        </button>
-      </form>
+      /* CHECKBOX */
+      case "checkbox":
+        return field.options?.map((opt, i) => (
+          <label key={i} style={{ marginRight: 10 }}>
+            <input
+              type="checkbox"
+              checked={
+                (answers[field.label] || []).includes(opt)
+              }
+              onChange={() =>
+                handleCheckbox(field.label, opt)
+              }
+            />
+            {opt}
+          </label>
+        ));
+
+      default:
+        return (
+          <input
+            type="text"
+            value={value}
+            onChange={(e) =>
+              handleChange(e.target.value, field.label)
+            }
+          />
+        );
+    }
+  };
+
+  /* ---------- UI ---------- */
+  return (
+    <div className="form-wrapper">
+      <div className="form-box">
+        <h2 className="form-title">{form.title}</h2>
+
+        <form onSubmit={submitForm}>
+          {fields.map((field, index) => (
+            <div key={index} className="form-field">
+              <label>{field.label}</label>
+              {renderField(field)}
+            </div>
+          ))}
+
+          <button type="submit" className="submit-btn">
+            Submit
+          </button>
+        </form>
+      </div>
     </div>
-  </div>
-);
+  );
 }
 
 export default FormPage;
